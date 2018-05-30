@@ -1,32 +1,33 @@
 package entities;
 
 public class Personnage {
-	
-	
-	private String  pseudo;
-	private int  profil;
-	private int capacite;
+
+	private String pseudo;
+	private Profil profil;
+	private Capaciter capacite;
+
 	public String getPseudo() {
 		return pseudo;
 	}
+
 	public void setPseudo(String pseudo) {
 		this.pseudo = pseudo;
 	}
-	public int getProfil() {
+
+	public Profil getProfil() {
 		return profil;
 	}
-	public void setProfil(int profil) {
+
+	public void setProfil(Profil profil) {
 		this.profil = profil;
 	}
-	public int getCapacite() {
+
+	public Capaciter getCapacite() {
 		return capacite;
 	}
-	public void setCapacite(int capacite) {
+
+	public void setCapacite(Capaciter capacite) {
 		this.capacite = capacite;
 	}
-	
-	
-	
-	
 
 }
