@@ -1,8 +1,14 @@
 package entities;
 
-public class TypeAttaque {
+import java.io.Serializable;
+
+public class TypeAttaque implements Serializable {
 	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int typeAttaque;
 	private String description;
 	

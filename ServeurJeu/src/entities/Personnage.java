@@ -1,7 +1,14 @@
 package entities;
 
-public class Personnage {
+import java.io.Serializable;
 
+public class Personnage implements Serializable {
+
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String pseudo;
 	private Profil profil;
 	private Capaciter capacite;

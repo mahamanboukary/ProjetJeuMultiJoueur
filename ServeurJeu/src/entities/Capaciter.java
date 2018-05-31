@@ -1,6 +1,8 @@
 package entities;
 
-public class Capaciter {
+import java.io.Serializable;
+
+public class Capaciter  implements Serializable{
 
 	private int capacite;
 	private int nombreVie;

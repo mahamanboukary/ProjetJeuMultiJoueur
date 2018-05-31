@@ -1,7 +1,13 @@
 package entities;
 
-public class Profil {
+import java.io.Serializable;
 
+public class Profil implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int profil;
 	private int resistance;
 	private TypeAttaque typeAttaque;
