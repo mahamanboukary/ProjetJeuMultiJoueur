@@ -1,5 +1,5 @@
 package entities;
-
+//gggggggggggggggggggggggggggggggggggggggggggg
 import java.io.Serializable;
 
 public class TypeAttaque implements Serializable {
