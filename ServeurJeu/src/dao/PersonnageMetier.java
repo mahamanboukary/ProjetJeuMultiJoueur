@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -24,7 +26,20 @@ public class PersonnageMetier {
 	private ResultSet rs = null;
 	private static List<String> personneConnecter  = new ArrayList<>();
 	
+	static HashMap<String, Calendar> hmap = new HashMap<String, Calendar>();
+	
+	public static void initiliseMap() {
+		Calendar cal = Calendar.getInstance();
+		hmap.put("LIK", cal);
+		hmap.put("MA", cal);
+	}
+	
+	public static HashMap<String, Calendar> getMap() {
+		return hmap;
+	}
+	
 	public  void decoonecter(String pseudo) {
+		hmap.remove(pseudo);
 		personneConnecter.remove(pseudo);
 	}
 	// Methode de creation d'une capacite
@@ -61,6 +76,10 @@ public class PersonnageMetier {
 			rs = st.executeQuery();
 			if (rs.first()) {
 				personneConnecter.add(pseudo);
+				Calendar cal = Calendar.getInstance();
+				hmap.put(pseudo, cal);
+				System.out.println(pseudo + "connceter" );
+				
 				return true;
 			}
 
@@ -90,14 +109,30 @@ public class PersonnageMetier {
 	}
 	
 	//mise à jour de la capacité
-		public void UpdateCapaciter(Capaciter capaciter) {
+		public void UpdateCapaciter(String pseudo, Boolean estAttaque) {
 			
+			//System.out.println(hmap.get(pseudo).getTimeInMillis());
+			Personnage pers = new Personnage();
+			pers.setPseudo(pseudo);
+			Personnage personnage = getPersonnage(pers);
+			System.out.println(personnage.getPseudo()+ " "+personnage.getCapacite().getNombreVie());
 			try {
-				st = con.prepareStatement("update capaciter set nombreVie = ?,scrore = ?, etat = ? where capacite = ?");
-				st.setInt(1, capaciter.getNombreVie());
-				st.setInt(2, capaciter.getScrore());
-				st.setBoolean(3, capaciter.isEtat());
-				st.setInt(4, capaciter.getCapacite());
+				st = con.prepareStatement("update capaciter set nombreVie = ? where capacite = ?");
+				if(estAttaque) {
+					if(personnage.getCapacite().getNombreVie() > 0 ) {
+						st.setInt(1, personnage.getCapacite().getNombreVie() - 1);
+					}else {
+						st.setInt(1, personnage.getCapacite().getNombreVie());
+					}	
+				}else {
+					if(personnage.getCapacite().getNombreVie() < 50 ) {
+						st.setInt(1, personnage.getCapacite().getNombreVie() + 1);
+					}else {
+						st.setInt(1, personnage.getCapacite().getNombreVie());
+					}
+				}
+				
+				st.setInt(2, personnage.getCapacite().getCapacite());
 				st.executeUpdate();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -178,12 +213,14 @@ public class PersonnageMetier {
 		}
 		
 		public List<Personnage> getPersonnageConnecter(){
-			personneConnecter.add("abdoulaye");
-			personneConnecter.add("maman sani");
+			//personneConnecter.clear();
+			//personneConnecter.add("sidi");
+			//personneConnecter.add("maman sani");
 			List<Personnage> personnageConnecter = new ArrayList<>();
 			for (String pseudo : personneConnecter) {
 				Personnage personnage = new Personnage();
 				personnage.setPseudo(pseudo);
+				//System.out.println("Repeter");
 				personnageConnecter.add(getPersonnage(personnage));
 				
 			}

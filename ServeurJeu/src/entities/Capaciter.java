@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 public class Capaciter  implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int capacite;
 	private int nombreVie;
 	private int scrore;

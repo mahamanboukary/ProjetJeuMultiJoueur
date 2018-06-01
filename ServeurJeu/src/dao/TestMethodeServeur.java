@@ -1,32 +1,35 @@
 package dao;
 
+import java.util.Calendar;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import entities.Personnage;
 import entities.Profil;
 
-public class TestMethodeServeur {
+public class TestMethodeServeur extends Thread {
 
-	public static void main(String[] args) {
-		
-		
-		
-		Personnage personnage = new Personnage();
-		Profil profil = new Profil();
-		profil.setProfil(2);
-		
-		personnage.setPseudo("LABO");
-		personnage.setProfil(profil);
-		System.out.println("la description "+personnage.getProfil().getProfil());
-		String pseudo = personnage.getPseudo();
-		
-		
-		PersonnageMetier personnageMetier = new PersonnageMetier();
-		
-		//personnageMetier.creerPersonnage(personnage);
-		System.out.println(personnageMetier.authentification("LABO"));
-		
-		
-		
+	  
+    @Override
+    public void run() {
+    	PersonnageMetier.initiliseMap();
+    	PersonnageMetier personnageMetier = new PersonnageMetier();
+    	
+    	for(java.util.Map.Entry<String, Calendar> entry : PersonnageMetier.getMap().entrySet()) {
+    	    String pseudo =  entry.getKey();
+    	    Calendar date =  entry.getValue();
+    	    if(date.getTimeInMillis() - Calendar.getInstance().getTimeInMillis() >= 50000 ) {
+    	    	System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
+    	    	//personnageMetier.UpdateCapaciter(pseudo, false);
+    	    }
+    	}
+    	
+    	
+    }
 
-	}
+     
+/*inal ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    executor.scheduleAtFixedRate(task, 0, 5, TimeUnit.SECONDS)*/
 
 }

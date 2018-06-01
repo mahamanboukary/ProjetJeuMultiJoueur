@@ -3,9 +3,13 @@ package service;
 import java.net.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.*;
 import dao.*;
+import entities.Capaciter;
 import entities.Personnage;
 import entities.Profil;
 
@@ -21,7 +25,7 @@ public class Serveur extends JFrame implements ActionListener {
 	private JTextArea zonerecep;
 	private JButton qt;
 	private JPanel pan1, pan2;
-	private String host = "10.7.222.252";
+	private String host = "192.168.43.129";
 
 	public Serveur() {
 		zonerecep = new JTextArea(15, 40);
@@ -50,6 +54,8 @@ public class Serveur extends JFrame implements ActionListener {
 				zonerecep.append("client n°:" + numclient + " adresse ip:" + ipclient + "\n");
 				zonerecep.append("nom machine cliente: " + nomclient + "\n");
 				Service s = new Service(socket);
+				TestMethodeServeur methodeServeur  = new TestMethodeServeur() ;
+				methodeServeur.start();
 				s.start();
 				numclient++;
 			}
@@ -73,28 +79,28 @@ public class Serveur extends JFrame implements ActionListener {
 
 		public void run() {
 			try {
-				//zonerecep.append("test 1");
+				// zonerecep.append("test 1");
 				ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 				ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 				DataInputStream in = new DataInputStream(socket.getInputStream());
-				//zonerecep.append("test 2");
+				// zonerecep.append("test 2");
 				String message;
 
-				//zonerecep.append("test 3");
+				// zonerecep.append("test 3");
 				do {
 
 					message = (String) ois.readObject();
-					//zonerecep.append("test 4");
+					// zonerecep.append("test 4");
 					zonerecep.append("mode en cours d\'expoitation!!!: " + message + "\n");
 					System.out.println("le type" + "salut");
 					switch (message) {
 					case "1":
 						Personnage creerPersonnage = (Personnage) ois.readObject();
 						creerPersonnage.getPseudo();
-						//zonerecep.append(" " + creerPersonnage.getPseudo() + "\n");
-						//zonerecep.append(" " + creerPersonnage.getProfil().getProfil() + "\n");
-						
+						// zonerecep.append(" " + creerPersonnage.getPseudo() + "\n");
+						// zonerecep.append(" " + creerPersonnage.getProfil().getProfil() + "\n");
+
 						personnageMetier.creerPersonnage(creerPersonnage);
 						oos.writeObject(" OK on a cree le profil :" + creerPersonnage.getPseudo());
 						break;
@@ -104,18 +110,34 @@ public class Serveur extends JFrame implements ActionListener {
 						listeperCinnecter = (List<Personnage>) personnageMetier.getPersonnageConnecter();
 						oos.writeObject(listeperCinnecter);
 						oos.flush();
-					
+
 					case "3":
-						String pseudo =  (String) ois.readObject();
-						//String pseudo = "LABO";
-						boolean resutalt =  personnageMetier.authentification(pseudo);
+						String pseudo = (String) ois.readObject();
+						// String pseudo = "LABO";
+						boolean resutalt = personnageMetier.authentification(pseudo);
 						zonerecep.append(resutalt + "\n");
-						//System.out.println(resutalt);
+						// System.out.println(resutalt);
 						oos.writeObject(resutalt);
-					
+					case "4":
+						//zonerecep.append(" ok \n");
+						String personnageChercher = (String) ois.readObject();
+						Personnage personnage2 = new Personnage();
+						zonerecep.append(" " + personnageChercher + "\n");
+						personnage2.setPseudo(personnageChercher);
+						zonerecep.append(" " + personnage2.getPseudo() + "\n");
+						Personnage personnage = personnageMetier.getPersonnage(personnage2);
+						oos.writeObject(personnage);
+						oos.flush();
+						break;
+					case "5":
 						
+						 String pseudo2 =  (String) ois.readObject();
+						 System.out.println(pseudo2);
+						 personnageMetier.UpdateCapaciter(pseudo2,true);
+						 System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+
 					case "6":
-						
+
 						List<Profil> listeProfil = new ArrayList<Profil>();
 						listeProfil = (List<Profil>) personnageMetier.listerProfils();
 						oos.writeObject(listeProfil);
@@ -123,8 +145,8 @@ public class Serveur extends JFrame implements ActionListener {
 						break;
 					case "7":
 						String pseudoDeconnecter = (String) ois.readObject();
-						personnageMetier.decoonecter(pseudoDeconnecter);				
-						
+						personnageMetier.decoonecter(pseudoDeconnecter);
+
 						break;
 					case "fin":
 						zonerecep.append("Connexion terminee!!! pour un personnage" + "\n");
@@ -151,6 +173,27 @@ public class Serveur extends JFrame implements ActionListener {
 
 	public static void main(String args[]) {
 		new Serveur();
+		System.out.println("ok");
+		final Runnable task = new Runnable() {
+            
+	        @Override
+	        public void run() {
+	        	PersonnageMetier.initiliseMap();
+	        	PersonnageMetier personnageMetier = new PersonnageMetier();
+	        	
+	        	for(java.util.Map.Entry<String, Calendar> entry : PersonnageMetier.getMap().entrySet()) {
+	        	    String pseudo =  entry.getKey();
+	        	    Calendar date =  entry.getValue();
+	        	    if(Calendar.getInstance().getTimeInMillis() - date.getTimeInMillis() >= 5 )
+	        	    	personnageMetier.UpdateCapaciter(pseudo, false);
+	        	}
+	        	
+	        	
+	        }
+	    };
+	         
+	    final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	        executor.scheduleAtFixedRate(task, 0, 5, TimeUnit.SECONDS);
 	}
 
 }
